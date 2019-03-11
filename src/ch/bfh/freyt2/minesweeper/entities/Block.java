@@ -3,37 +3,52 @@ package ch.bfh.freyt2.minesweeper.entities;
 import ch.bfh.freyt2.minesweeper.gamestates.GameState;
 import ch.bfh.freyt2.minesweeper.settings.Settings;
 import javafx.collections.ObservableList;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+
+import java.util.ArrayList;
 
 /**
  * This is the most important graphic element of the game.
  * This block displays the numbers and the flags set
  */
-public class Block extends Rectangle {
+public class Block extends Pane {
     private boolean bomb, clicked = false, flagged = false;
+    private Rectangle rectangle = new Rectangle(32,32);
     private int x, y;
+    private Label label = new Label("");
     public Block(boolean isBomb,int x,int y){
-        super(32,32);
         this.x = x;
         this.y = y;
         // create the graphics
-        this.setFill(Color.TRANSPARENT);
-        this.setStroke(Color.BLACK);
-
+        label.setAlignment(Pos.CENTER);
+        label.setMinSize(32,32);
+        label.setFont(new Font("Arial", 30));
+        rectangle.setFill(Color.TRANSPARENT);
+        rectangle.setStroke(Color.BLACK);
+        this.getChildren().addAll(rectangle,label);
         this.bomb = isBomb;
         this.setOnMouseClicked(event -> {
             // check which mouseButton clicked the Block
             // if it was the secondary button then change the isFlagged variable
             if (event.getButton() == MouseButton.SECONDARY) {
                 changeFlagged();
-            } else if (event.getButton() == MouseButton.SECONDARY) {
+            } else if (event.getButton() == MouseButton.PRIMARY) {
                 clickSquare();
             }
         });
+    }
+
+    public void setBomb(boolean bomb) {
+        this.bomb = bomb;
     }
 
     public boolean isClicked() {
@@ -64,15 +79,15 @@ public class Block extends Rectangle {
             Settings.gamestate = GameState.LOST;
         }else{
             // TODO:check if won
-
             // calculate adjacent Bombs
-            calculateAdjacentBombs();
-
-            // TODO:change the text to the amount of adjacent bombs
-
-            // TODO: show this square
-            this.setFill(Color.GREEN);
-            // TODO: if adjacentbombs = 0 then click all of the adjacent squares
+            int neighborBombs = calculateAdjacentBombs();
+            rectangle.setFill(Color.GREEN);
+            if(neighborBombs >0){
+                label.setText(String.valueOf(neighborBombs));
+                label.setTextFill(Color.RED);
+            }else{
+                clickNeighbors();
+            }
         }
     }
 
@@ -81,49 +96,11 @@ public class Block extends Rectangle {
      */
     private int calculateAdjacentBombs() {
         int bombneighbors = 0;
-        if(this.x<Settings.SIZE&&this.y>0) {
-            if(getNodeByRowColumnIndex(this.x+1,this.y-1).isBomb()){
+        for(Block neighbor: getNeighbors()){
+            if(neighbor.isBomb()){
                 bombneighbors++;
             }
         }
-        if(this.x<Settings.SIZE) {
-            if(getNodeByRowColumnIndex(this.x+1,this.y).isBomb()){
-                bombneighbors++;
-            }
-        }
-        if(this.x<Settings.SIZE&&this.y<Settings.SIZE) {
-            if(getNodeByRowColumnIndex(this.x+1,this.y+1).isBomb()){
-                bombneighbors++;
-            }
-        }
-
-        if(this.y>0) {
-            if(getNodeByRowColumnIndex(this.x,this.y-1).isBomb()){
-                bombneighbors++;
-            }
-        }
-        if(this.y<Settings.SIZE) {
-            if(getNodeByRowColumnIndex(this.x,this.y+1).isBomb()){
-                bombneighbors++;
-            }
-        }
-
-        if(this.x>0&&this.y>0) {
-            if(getNodeByRowColumnIndex(this.x-1,this.y-1).isBomb()){
-                bombneighbors++;
-            }
-        }
-        if(this.x>0) {
-            if(getNodeByRowColumnIndex(this.x-1,this.y).isBomb()){
-                bombneighbors++;
-            }
-        }
-        if(this.x>0&&this.y<Settings.SIZE) {
-            if(getNodeByRowColumnIndex(this.x-1,this.y+1).isBomb()){
-                bombneighbors++;
-            }
-        }
-
         return bombneighbors;
     }
 
@@ -139,5 +116,42 @@ public class Block extends Rectangle {
         }
 
         return (Block)result;
+    }
+
+    private void clickNeighbors(){
+        for(Block neighbor: getNeighbors()){
+            neighbor.clickSquare();
+        }
+    }
+
+    private ArrayList<Block> getNeighbors(){
+        ArrayList<Block> neighbors = new ArrayList<>();
+        if(this.x+1<Settings.SIZE&&this.y>0) {
+            neighbors.add(getNodeByRowColumnIndex(this.y-1,this.x+1));
+        }
+        if(this.x+1<Settings.SIZE) {
+            neighbors.add(getNodeByRowColumnIndex(this.y,this.x+1));
+        }
+        if(this.x+1<Settings.SIZE&&this.y+1<Settings.SIZE) {
+            neighbors.add(getNodeByRowColumnIndex(this.y+1,this.x+1));
+        }
+
+        if(this.y>0) {
+            neighbors.add(getNodeByRowColumnIndex(this.y-1,this.x));
+        }
+        if(this.y+1<Settings.SIZE) {
+            neighbors.add(getNodeByRowColumnIndex(this.y+1,this.x));
+        }
+
+        if(this.x>0&&this.y>0) {
+            neighbors.add(getNodeByRowColumnIndex(this.y-1,this.x-1));
+        }
+        if(this.x>0) {
+            neighbors.add(getNodeByRowColumnIndex(this.y,this.x-1));
+        }
+        if(this.x>0&&this.y+1<Settings.SIZE) {
+            neighbors.add(getNodeByRowColumnIndex(this.y+1,this.x-1));
+        }
+        return neighbors;
     }
 }
