@@ -1,17 +1,13 @@
 package ch.bfh.freyt2.minesweeper.entities;
 
+import ch.bfh.freyt2.minesweeper.application.MinesweeperApplication;
 import ch.bfh.freyt2.minesweeper.gamestates.GameState;
 import ch.bfh.freyt2.minesweeper.settings.Settings;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
 import java.util.ArrayList;
@@ -22,19 +18,19 @@ import java.util.ArrayList;
  */
 public class Block extends Pane {
     private boolean bomb, clicked = false, flagged = false;
-    private Rectangle rectangle = new Rectangle(32,32);
     private int x, y;
     private Label label = new Label("");
     public Block(boolean isBomb,int x,int y){
+        this.setWidth(32);
+        this.setHeight(32);
         this.x = x;
         this.y = y;
+        setDefaultStyle();
         // create the graphics
         label.setAlignment(Pos.CENTER);
         label.setMinSize(32,32);
-        label.setFont(new Font("Arial", 30));
-        rectangle.setFill(Color.TRANSPARENT);
-        rectangle.setStroke(Color.BLACK);
-        this.getChildren().addAll(rectangle,label);
+        label.setFont(new Font("Arial", 24));
+        this.getChildren().addAll(label);
         this.bomb = isBomb;
         this.setOnMouseClicked(event -> {
             // check which mouseButton clicked the Block
@@ -64,30 +60,56 @@ public class Block extends Pane {
     }
 
     private void changeFlagged(){
-        if(isClicked())return;
+        if(isClicked()||MinesweeperApplication.gamestate!=GameState.RUNNING)return;
         flagged = !flagged;
+        if(isFlagged()){
+            MinesweeperApplication.changeBombsLeft(-1);
+            if((x+y)%2 == 0){
+                this.setStyle("-fx-background-color: "+Settings.tileColor1+";-fx-background-image: url(images/flag.png)");
+            }else{
+                this.setStyle("-fx-background-color: "+Settings.tileColor2+";-fx-background-image: url(images/flag.png)");
+            }
+        }else{
+            setDefaultStyle();
+            MinesweeperApplication.changeBombsLeft(1);
+        }
     }
 
     /**
      * used to click a square
      */
     private void clickSquare(){
-        if(isFlagged()||isClicked())return;
+        if(isFlagged()||isClicked()||MinesweeperApplication.gamestate!=GameState.RUNNING)return;
+        //if this is the first click
+        if(MinesweeperApplication.firstClick){
+            if(isBomb()||calculateAdjacentBombs()!=0){
+                MinesweeperApplication.resetBombs();
+                this.clickSquare();
+            }else{
+                MinesweeperApplication.firstClick = false;
+            }
+        }
         clicked = true;
         // game lost is bomb
         if(isBomb()){
-            Settings.gamestate = GameState.LOST;
+            this.setStyle("-fx-background-color: Red");
+            MinesweeperApplication.lose();
         }else{
-            // TODO:check if won
+            MinesweeperApplication.decreaseBlockLeft();
             // calculate adjacent Bombs
             int neighborBombs = calculateAdjacentBombs();
-            rectangle.setFill(Color.GREEN);
+            if((x+y)%2 == 0){
+                this.setStyle("-fx-background-color: "+Settings.tileColorClicked1);
+            }else{
+                this.setStyle("-fx-background-color: "+Settings.tileColorClicked2);
+            }
             if(neighborBombs >0){
                 label.setText(String.valueOf(neighborBombs));
                 label.setTextFill(Color.RED);
             }else{
                 clickNeighbors();
             }
+
         }
     }
 
@@ -104,20 +126,6 @@ public class Block extends Pane {
         return bombneighbors;
     }
 
-    private Block getNodeByRowColumnIndex(final int row, final int column) {
-        Node result = null;
-        ObservableList<Node> childrens = this.getParent().getChildrenUnmodifiable();
-
-        for (Node node : childrens) {
-            if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) {
-                result = node;
-                break;
-            }
-        }
-
-        return (Block)result;
-    }
-
     private void clickNeighbors(){
         for(Block neighbor: getNeighbors()){
             neighbor.clickSquare();
@@ -127,31 +135,47 @@ public class Block extends Pane {
     private ArrayList<Block> getNeighbors(){
         ArrayList<Block> neighbors = new ArrayList<>();
         if(this.x+1<Settings.SIZE&&this.y>0) {
-            neighbors.add(getNodeByRowColumnIndex(this.y-1,this.x+1));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y-1,this.x+1));
         }
         if(this.x+1<Settings.SIZE) {
-            neighbors.add(getNodeByRowColumnIndex(this.y,this.x+1));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y,this.x+1));
         }
         if(this.x+1<Settings.SIZE&&this.y+1<Settings.SIZE) {
-            neighbors.add(getNodeByRowColumnIndex(this.y+1,this.x+1));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y+1,this.x+1));
         }
 
         if(this.y>0) {
-            neighbors.add(getNodeByRowColumnIndex(this.y-1,this.x));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y-1,this.x));
         }
         if(this.y+1<Settings.SIZE) {
-            neighbors.add(getNodeByRowColumnIndex(this.y+1,this.x));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y+1,this.x));
         }
 
         if(this.x>0&&this.y>0) {
-            neighbors.add(getNodeByRowColumnIndex(this.y-1,this.x-1));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y-1,this.x-1));
         }
         if(this.x>0) {
-            neighbors.add(getNodeByRowColumnIndex(this.y,this.x-1));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y,this.x-1));
         }
         if(this.x>0&&this.y+1<Settings.SIZE) {
-            neighbors.add(getNodeByRowColumnIndex(this.y+1,this.x-1));
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y+1,this.x-1));
         }
         return neighbors;
+    }
+
+    private void setDefaultStyle(){
+        if((this.x+this.y)%2 == 0){
+            this.setStyle("-fx-background-color: "+Settings.tileColor1);
+        }else{
+            this.setStyle("-fx-background-color: "+Settings.tileColor2);
+        }
+    }
+
+    public void resetBlock(){
+        label.setText("");
+        setDefaultStyle();
+        setBomb(false);
+        clicked = false;
+        flagged = false;
     }
 }
