@@ -20,7 +20,8 @@ public class Block extends Pane {
     private boolean bomb, clicked = false, flagged = false;
     private int x, y;
     private Label label = new Label("");
-    public Block(boolean isBomb,int x,int y){
+
+    public Block(boolean isBomb, int x, int y) {
         this.setWidth(32);
         this.setHeight(32);
         this.x = x;
@@ -28,7 +29,7 @@ public class Block extends Pane {
         setDefaultStyle();
         // create the graphics
         label.setAlignment(Pos.CENTER);
-        label.setMinSize(32,32);
+        label.setMinSize(32, 32);
         label.setFont(new Font("Arial", 24));
         this.getChildren().addAll(label);
         this.bomb = isBomb;
@@ -59,17 +60,17 @@ public class Block extends Pane {
         return flagged;
     }
 
-    private void changeFlagged(){
-        if(isClicked()||MinesweeperApplication.gamestate!=GameState.RUNNING)return;
+    private void changeFlagged() {
+        if (isClicked() || MinesweeperApplication.gamestate != GameState.RUNNING) return;
         flagged = !flagged;
-        if(isFlagged()){
+        if (isFlagged()) {
             MinesweeperApplication.changeBombsLeft(-1);
-            if((x+y)%2 == 0){
-                this.setStyle("-fx-background-color: "+Settings.tileColor1+";-fx-background-image: url(images/flag.png)");
-            }else{
-                this.setStyle("-fx-background-color: "+Settings.tileColor2+";-fx-background-image: url(images/flag.png)");
+            if ((x + y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.tileColor1 + ";-fx-background-image: url(images/flag.png)");
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.tileColor2 + ";-fx-background-image: url(images/flag.png)");
             }
-        }else{
+        } else {
             setDefaultStyle();
             MinesweeperApplication.changeBombsLeft(1);
         }
@@ -78,35 +79,35 @@ public class Block extends Pane {
     /**
      * used to click a square
      */
-    private void clickSquare(){
-        if(isFlagged()||isClicked()||MinesweeperApplication.gamestate!=GameState.RUNNING)return;
+    private void clickSquare() {
+        if (isFlagged() || isClicked() || MinesweeperApplication.gamestate != GameState.RUNNING) return;
         //if this is the first click
-        if(MinesweeperApplication.firstClick){
-            if(isBomb()||calculateAdjacentBombs()!=0){
+        if (MinesweeperApplication.firstClick) {
+            if (isBomb() || calculateAdjacentBombs() != 0) {
                 MinesweeperApplication.resetBombs();
                 this.clickSquare();
-            }else{
+            } else {
                 MinesweeperApplication.firstClick = false;
             }
         }
         clicked = true;
         // game lost is bomb
-        if(isBomb()){
+        if (isBomb()) {
             this.setStyle("-fx-background-color: Red");
             MinesweeperApplication.lose();
-        }else{
+        } else {
             MinesweeperApplication.decreaseBlockLeft();
             // calculate adjacent Bombs
             int neighborBombs = calculateAdjacentBombs();
-            if((x+y)%2 == 0){
-                this.setStyle("-fx-background-color: "+Settings.tileColorClicked1);
-            }else{
-                this.setStyle("-fx-background-color: "+Settings.tileColorClicked2);
+            if ((x + y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.tileColorClicked1);
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.tileColorClicked2);
             }
-            if(neighborBombs >0){
+            if (neighborBombs > 0) {
                 label.setText(String.valueOf(neighborBombs));
                 label.setTextFill(Color.RED);
-            }else{
+            } else {
                 clickNeighbors();
             }
 
@@ -118,60 +119,60 @@ public class Block extends Pane {
      */
     private int calculateAdjacentBombs() {
         int bombneighbors = 0;
-        for(Block neighbor: getNeighbors()){
-            if(neighbor.isBomb()){
+        for (Block neighbor : getNeighbors()) {
+            if (neighbor.isBomb()) {
                 bombneighbors++;
             }
         }
         return bombneighbors;
     }
 
-    private void clickNeighbors(){
-        for(Block neighbor: getNeighbors()){
+    private void clickNeighbors() {
+        for (Block neighbor : getNeighbors()) {
             neighbor.clickSquare();
         }
     }
 
-    private ArrayList<Block> getNeighbors(){
+    private ArrayList<Block> getNeighbors() {
         ArrayList<Block> neighbors = new ArrayList<>();
-        if(this.x+1<Settings.SIZE&&this.y>0) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y-1,this.x+1));
+        if (this.x + 1 < Settings.SIZE && this.y > 0) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y - 1, this.x + 1));
         }
-        if(this.x+1<Settings.SIZE) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y,this.x+1));
+        if (this.x + 1 < Settings.SIZE) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y, this.x + 1));
         }
-        if(this.x+1<Settings.SIZE&&this.y+1<Settings.SIZE) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y+1,this.x+1));
-        }
-
-        if(this.y>0) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y-1,this.x));
-        }
-        if(this.y+1<Settings.SIZE) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y+1,this.x));
+        if (this.x + 1 < Settings.SIZE && this.y + 1 < Settings.SIZE) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y + 1, this.x + 1));
         }
 
-        if(this.x>0&&this.y>0) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y-1,this.x-1));
+        if (this.y > 0) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y - 1, this.x));
         }
-        if(this.x>0) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y,this.x-1));
+        if (this.y + 1 < Settings.SIZE) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y + 1, this.x));
         }
-        if(this.x>0&&this.y+1<Settings.SIZE) {
-            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y+1,this.x-1));
+
+        if (this.x > 0 && this.y > 0) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y - 1, this.x - 1));
+        }
+        if (this.x > 0) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y, this.x - 1));
+        }
+        if (this.x > 0 && this.y + 1 < Settings.SIZE) {
+            neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y + 1, this.x - 1));
         }
         return neighbors;
     }
 
-    private void setDefaultStyle(){
-        if((this.x+this.y)%2 == 0){
-            this.setStyle("-fx-background-color: "+Settings.tileColor1);
-        }else{
-            this.setStyle("-fx-background-color: "+Settings.tileColor2);
+    private void setDefaultStyle() {
+        if ((this.x + this.y) % 2 == 0) {
+            this.setStyle("-fx-background-color: " + Settings.tileColor1);
+        } else {
+            this.setStyle("-fx-background-color: " + Settings.tileColor2);
         }
     }
 
-    public void resetBlock(){
+    public void resetBlock() {
         label.setText("");
         setDefaultStyle();
         setBomb(false);

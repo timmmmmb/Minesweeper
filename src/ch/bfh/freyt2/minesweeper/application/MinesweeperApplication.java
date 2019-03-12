@@ -30,12 +30,13 @@ public class MinesweeperApplication extends Application {
     private static Label gameStateLabel = new Label("");
     private static int blocksleft;
     public static GameState gamestate = GameState.RUNNING;
+
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) {
         createGrid();
         restart();
         VBox rootPane = new VBox(gameStateLabel, minesleftlabel, gamePane);
-        Scene gameScene = new Scene(rootPane, Settings.WIDTH,Settings.HEIGHT);
+        Scene gameScene = new Scene(rootPane, Settings.WIDTH, Settings.HEIGHT);
         gameScene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.R) {
                 restart();
@@ -45,9 +46,9 @@ public class MinesweeperApplication extends Application {
         primaryStage.show();
     }
 
-    public static void resetBombs(){
+    public static void resetBombs() {
         //remove all bombs
-        for(Node block:gamePane.getChildren()){
+        for (Node block : gamePane.getChildren()) {
             ((Block) block).resetBlock();
         }
         //add them again
@@ -57,29 +58,29 @@ public class MinesweeperApplication extends Application {
     /**
      * adds bombs to the GridPane
      */
-    private static void addBombs(){
+    private static void addBombs() {
         int i = 0;
-        while( i<Settings.BOMBS){
-            int x = (int)((Math.random()) * ((Settings.SIZE)));
-            int y = (int)((Math.random()) * ((Settings.SIZE)));
-            Block selected = getNodeByRowColumnIndex(x,y);
-            if(!selected.isBomb()){
+        while (i < Settings.BOMBS) {
+            int x = (int) ((Math.random()) * ((Settings.SIZE)));
+            int y = (int) ((Math.random()) * ((Settings.SIZE)));
+            Block selected = getNodeByRowColumnIndex(x, y);
+            if (!selected.isBomb()) {
                 selected.setBomb(true);
                 i++;
             }
         }
     }
 
-    private void restart(){
+    private void restart() {
         firstClick = true;
         gamestate = GameState.RUNNING;
         minesleft = Settings.BOMBS;
         gameStateLabel.setText("");
         minesleftlabel.setText(String.valueOf(minesleft));
-        blocksleft = (Settings.SIZE*Settings.SIZE)-Settings.BOMBS;
+        blocksleft = (Settings.SIZE * Settings.SIZE) - Settings.BOMBS;
         resetBombs();
-        minesleftlabel.setMinSize(320,80);
-        gameStateLabel.setMinSize(320,40);
+        minesleftlabel.setMinSize(320, 80);
+        gameStateLabel.setMinSize(320, 40);
         gameStateLabel.setFont(new Font("Arial", 24));
         gameStateLabel.setAlignment(Pos.CENTER);
         minesleftlabel.setFont(new Font("Arial", 24));
@@ -89,12 +90,12 @@ public class MinesweeperApplication extends Application {
     /**
      * creates a new gamegrid
      */
-    private void createGrid(){
+    private void createGrid() {
         gamePane = new GridPane();
         // add the game squares
-        for(int i = 0; i< Settings.SIZE; i++){
-            for(int j = 0; j< Settings.SIZE; j++){
-                gamePane.add(new Block(false,i,j),i,j);
+        for (int i = 0; i < Settings.SIZE; i++) {
+            for (int j = 0; j < Settings.SIZE; j++) {
+                gamePane.add(new Block(false, i, j), i, j);
             }
         }
         addBombs();
@@ -105,33 +106,34 @@ public class MinesweeperApplication extends Application {
         ObservableList<Node> childrens = gamePane.getChildren();
 
         for (Node node : childrens) {
-            if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) {
+            if (GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) {
                 result = node;
                 break;
             }
         }
 
-        return (Block)result;
+        return (Block) result;
     }
 
-    public static void changeBombsLeft(int amount){
+    public static void changeBombsLeft(int amount) {
         minesleft += amount;
         minesleftlabel.setText(String.valueOf(minesleft));
     }
 
-    public static void decreaseBlockLeft(){
+    public static void decreaseBlockLeft() {
+        System.out.println("decreaseBlockLeft");
         blocksleft--;
-        if(blocksleft == 0){
+        if (blocksleft == 0) {
             win();
         }
     }
 
-    public static void win(){
+    public static void win() {
         gamestate = GameState.WON;
         gameStateLabel.setText("WON");
     }
 
-    public static void lose(){
+    public static void lose() {
         gamestate = GameState.LOST;
         gameStateLabel.setText("Lost");
     }
