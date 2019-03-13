@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
 import java.util.ArrayList;
@@ -33,6 +34,18 @@ public class Block extends Pane {
         label.setFont(new Font("Arial", 24));
         this.getChildren().addAll(label);
         this.bomb = isBomb;
+        this.setOnMouseEntered(event -> {
+            if(clicked)return;
+            if ((this.x + this.y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.tileColorHover1);
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.tileColorHover2);
+            }
+        });
+        this.setOnMouseExited(event -> {
+            if(clicked)return;
+            this.setDefaultStyle();
+        });
         this.setOnMouseClicked(event -> {
             // check which mouseButton clicked the Block
             // if it was the secondary button then change the isFlagged variable
@@ -66,9 +79,9 @@ public class Block extends Pane {
         if (isFlagged()) {
             MinesweeperApplication.changeBombsLeft(-1);
             if ((x + y) % 2 == 0) {
-                this.setStyle("-fx-background-color: " + Settings.tileColor1 + ";-fx-background-image: url(images/flag.png)");
+                this.setStyle("-fx-background-color: " + Settings.tileColor1 + ";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
             } else {
-                this.setStyle("-fx-background-color: " + Settings.tileColor2 + ";-fx-background-image: url(images/flag.png)");
+                this.setStyle("-fx-background-color: " + Settings.tileColor2 + ";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
             }
         } else {
             setDefaultStyle();
@@ -84,8 +97,10 @@ public class Block extends Pane {
         //if this is the first click
         if (MinesweeperApplication.firstClick) {
             if (isBomb() || calculateAdjacentBombs() != 0) {
+                System.out.println("reset");
                 MinesweeperApplication.resetBombs();
                 this.clickSquare();
+                return;
             } else {
                 MinesweeperApplication.firstClick = false;
             }
@@ -93,7 +108,7 @@ public class Block extends Pane {
         clicked = true;
         // game lost is bomb
         if (isBomb()) {
-            this.setStyle("-fx-background-color: Red");
+            this.setStyle(this.getStyle()+";-fx-background-image: url(images/bomb.png);-fx-background-size: cover;");
             MinesweeperApplication.lose();
         } else {
             MinesweeperApplication.decreaseBlockLeft();
@@ -106,7 +121,7 @@ public class Block extends Pane {
             }
             if (neighborBombs > 0) {
                 label.setText(String.valueOf(neighborBombs));
-                label.setTextFill(Color.RED);
+                setFontColor(neighborBombs);
             } else {
                 clickNeighbors();
             }
@@ -178,5 +193,18 @@ public class Block extends Pane {
         setBomb(false);
         clicked = false;
         flagged = false;
+    }
+
+    private void setFontColor(int adjacent){
+        switch( adjacent){
+            case 1: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor1)); break;
+            case 2: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor2)); break;
+            case 3: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor3)); break;
+            case 4: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor4)); break;
+            case 5: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor5)); break;
+            case 6: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor6)); break;
+            case 7: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor7)); break;
+            case 8: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor8)); break;
+        }
     }
 }

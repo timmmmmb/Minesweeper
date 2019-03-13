@@ -16,11 +16,11 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
- * TODO: change the color of the Labels dependant of the amount of adjacent bombs
  * TODO: change the header to look ok
  * TODO: add a bot that tests if the game can be solved everytime
  * TODO: add multiple difficulties
  * TODO: add a color when hovering blocks
+ * TODO: find a better flag image
  */
 public class MinesweeperApplication extends Application {
     public static boolean firstClick = true;
@@ -42,6 +42,7 @@ public class MinesweeperApplication extends Application {
                 restart();
             }
         });
+        primaryStage.setResizable(false);
         primaryStage.setScene(gameScene);
         primaryStage.show();
     }
@@ -77,8 +78,8 @@ public class MinesweeperApplication extends Application {
         minesleft = Settings.BOMBS;
         gameStateLabel.setText("");
         minesleftlabel.setText(String.valueOf(minesleft));
-        blocksleft = (Settings.SIZE * Settings.SIZE) - Settings.BOMBS;
         resetBombs();
+        blocksleft = (((Settings.SIZE) * (Settings.SIZE)) - Settings.BOMBS);
         minesleftlabel.setMinSize(320, 80);
         gameStateLabel.setMinSize(320, 40);
         gameStateLabel.setFont(new Font("Arial", 24));
@@ -121,8 +122,8 @@ public class MinesweeperApplication extends Application {
     }
 
     public static void decreaseBlockLeft() {
-        System.out.println("decreaseBlockLeft");
         blocksleft--;
+        System.out.println("decreaseBlockLeft "+blocksleft+" / "+(((Settings.SIZE) * (Settings.SIZE)) - Settings.BOMBS));
         if (blocksleft == 0) {
             win();
         }
