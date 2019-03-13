@@ -7,7 +7,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 
@@ -35,12 +34,7 @@ public class Block extends Pane {
         this.getChildren().addAll(label);
         this.bomb = isBomb;
         this.setOnMouseEntered(event -> {
-            if(clicked)return;
-            if ((this.x + this.y) % 2 == 0) {
-                this.setStyle("-fx-background-color: " + Settings.tileColorHover1);
-            } else {
-                this.setStyle("-fx-background-color: " + Settings.tileColorHover2);
-            }
+            setDefaultHoverd();
         });
         this.setOnMouseExited(event -> {
             if(clicked)return;
@@ -78,11 +72,7 @@ public class Block extends Pane {
         flagged = !flagged;
         if (isFlagged()) {
             MinesweeperApplication.changeBombsLeft(-1);
-            if ((x + y) % 2 == 0) {
-                this.setStyle("-fx-background-color: " + Settings.tileColor1 + ";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
-            } else {
-                this.setStyle("-fx-background-color: " + Settings.tileColor2 + ";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
-            }
+            setDefaultStyle();
         } else {
             setDefaultStyle();
             MinesweeperApplication.changeBombsLeft(1);
@@ -103,6 +93,7 @@ public class Block extends Pane {
                 return;
             } else {
                 MinesweeperApplication.firstClick = false;
+                MinesweeperApplication.timeline.play();
             }
         }
         clicked = true;
@@ -114,11 +105,7 @@ public class Block extends Pane {
             MinesweeperApplication.decreaseBlockLeft();
             // calculate adjacent Bombs
             int neighborBombs = calculateAdjacentBombs();
-            if ((x + y) % 2 == 0) {
-                this.setStyle("-fx-background-color: " + Settings.tileColorClicked1);
-            } else {
-                this.setStyle("-fx-background-color: " + Settings.tileColorClicked2);
-            }
+            setDefaultStyle();
             if (neighborBombs > 0) {
                 label.setText(String.valueOf(neighborBombs));
                 setFontColor(neighborBombs);
@@ -150,20 +137,20 @@ public class Block extends Pane {
 
     private ArrayList<Block> getNeighbors() {
         ArrayList<Block> neighbors = new ArrayList<>();
-        if (this.x + 1 < Settings.SIZE && this.y > 0) {
+        if (this.x + 1 < Settings.getBoardwidth() && this.y > 0) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y - 1, this.x + 1));
         }
-        if (this.x + 1 < Settings.SIZE) {
+        if (this.x + 1 < Settings.getBoardwidth()) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y, this.x + 1));
         }
-        if (this.x + 1 < Settings.SIZE && this.y + 1 < Settings.SIZE) {
+        if (this.x + 1 < Settings.getBoardwidth() && this.y + 1 < Settings.getBoardheight()) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y + 1, this.x + 1));
         }
 
         if (this.y > 0) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y - 1, this.x));
         }
-        if (this.y + 1 < Settings.SIZE) {
+        if (this.y + 1 < Settings.getBoardheight()) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y + 1, this.x));
         }
 
@@ -173,38 +160,69 @@ public class Block extends Pane {
         if (this.x > 0) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y, this.x - 1));
         }
-        if (this.x > 0 && this.y + 1 < Settings.SIZE) {
+        if (this.x > 0 && this.y + 1 < Settings.getBoardheight()) {
             neighbors.add(MinesweeperApplication.getNodeByRowColumnIndex(this.y + 1, this.x - 1));
         }
         return neighbors;
     }
 
     private void setDefaultStyle() {
-        if ((this.x + this.y) % 2 == 0) {
-            this.setStyle("-fx-background-color: " + Settings.tileColor1);
-        } else {
-            this.setStyle("-fx-background-color: " + Settings.tileColor2);
+        if(isClicked()){
+            if ((x + y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.getTileColorClicked1());
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.getTileColorClicked2());
+            }
+        }else if(!isFlagged()){
+            if ((this.x + this.y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.getTileColor1());
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.getTileColor2());
+            }
+        }else{
+            if ((x + y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.getTileColor1() + ";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.getTileColor2() + ";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
+            }
         }
     }
 
     public void resetBlock() {
         label.setText("");
-        setDefaultStyle();
         setBomb(false);
         clicked = false;
         flagged = false;
+        setDefaultStyle();
     }
 
     private void setFontColor(int adjacent){
         switch( adjacent){
-            case 1: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor1)); break;
-            case 2: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor2)); break;
-            case 3: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor3)); break;
-            case 4: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor4)); break;
-            case 5: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor5)); break;
-            case 6: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor6)); break;
-            case 7: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor7)); break;
-            case 8: label.setTextFill(Paint.valueOf(Settings.adjacentBombsColor8)); break;
+            case 1: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor1())); break;
+            case 2: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor2())); break;
+            case 3: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor3())); break;
+            case 4: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor4())); break;
+            case 5: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor5())); break;
+            case 6: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor6())); break;
+            case 7: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor7())); break;
+            case 8: label.setTextFill(Paint.valueOf(Settings.getAdjacentBombsColor8())); break;
+        }
+    }
+
+    private void setDefaultHoverd(){
+        if(clicked)return;
+        if(!isFlagged()){
+            if ((this.x + this.y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.getTileColorHover1());
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.getTileColorHover2());
+            }
+        }else {
+            if ((this.x + this.y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.getTileColorHover1()+";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.getTileColorHover2()+";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
+            }
         }
     }
 }
