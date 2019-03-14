@@ -1,11 +1,11 @@
 package ch.bfh.freyt2.minesweeper.settings;
 
 public class Settings {
-    private static int boardheight = 20;
+    private static int boardheight = 10;
     private static int boardwidth = 10;
     private static int bombs = (boardheight*boardwidth)/4;
-    private static int height = boardheight*32+180;
-    private static int width = boardwidth*32+20;
+    private static int height = boardheight*32+80;
+    private static int width = boardwidth*32+14;
 
     private static final String tileColor1 = "#5cf218";
     private static final String tileColor2 = "#7af442";

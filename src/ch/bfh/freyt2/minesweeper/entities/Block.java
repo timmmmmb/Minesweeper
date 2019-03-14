@@ -99,6 +99,7 @@ public class Block extends Pane {
         clicked = true;
         // game lost is bomb
         if (isBomb()) {
+            setDefaultStyle();
             this.setStyle(this.getStyle()+";-fx-background-image: url(images/bomb.png);-fx-background-size: cover;");
             MinesweeperApplication.lose();
         } else {
@@ -167,7 +168,7 @@ public class Block extends Pane {
     }
 
     private void setDefaultStyle() {
-        if(isClicked()){
+        if(isClicked()&&!isBomb()){
             if ((x + y) % 2 == 0) {
                 this.setStyle("-fx-background-color: " + Settings.getTileColorClicked1());
             } else {
