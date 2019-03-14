@@ -24,3 +24,5 @@ hs_err_pid*
 *.xml
 *.iml
 /bin/*
+
+/META-INF/*
