@@ -12,21 +12,22 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
- * TODO: change the header to look ok
  * TODO: add multiple difficulties
+ * TODO: add images to the header to look even better
  * TODO: add a bot that tests if the game can be solved everytime
  * TODO: find a better flag image
+ * TODO: show all mines at the end
  * TODO: remove wrong placed flags if you loose
  */
 public class MinesweeperApplication extends Application {
@@ -85,6 +86,8 @@ public class MinesweeperApplication extends Application {
         minesleftlabel.setStyle(textStyle);
         gameStage.setResizable(false);
         gameStage.setScene(gameScene);
+        gameStage.getIcons().add(new Image("images/bomb.png"));
+        gameStage.setTitle("Minesweeper");
         gameStage.show();
     }
 
@@ -194,6 +197,7 @@ public class MinesweeperApplication extends Application {
         gameStateLabel.setText("WON");
         gameStateLabel.setTextFill(Color.GREEN);
         gameStateLabel.toFront();
+        showBombs();
         timeline.stop();
     }
 
@@ -202,7 +206,14 @@ public class MinesweeperApplication extends Application {
         gameStateLabel.setText("Lost");
         gameStateLabel.setTextFill(Color.RED);
         gameStateLabel.toFront();
+        showBombs();
         timeline.stop();
+    }
+
+    private static void showBombs(){
+        for(Node block:gamePane.getChildren()){
+            ((Block) block).uncoverBomb();
+        }
     }
 
     private void increaseTime(){

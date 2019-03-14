@@ -99,8 +99,7 @@ public class Block extends Pane {
         clicked = true;
         // game lost is bomb
         if (isBomb()) {
-            setDefaultStyle();
-            this.setStyle(this.getStyle()+";-fx-background-image: url(images/bomb.png);-fx-background-size: cover;");
+            uncoverBomb();
             MinesweeperApplication.lose();
         } else {
             MinesweeperApplication.decreaseBlockLeft();
@@ -223,6 +222,20 @@ public class Block extends Pane {
                 this.setStyle("-fx-background-color: " + Settings.getTileColorHover1()+";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
             } else {
                 this.setStyle("-fx-background-color: " + Settings.getTileColorHover2()+";-fx-background-image: url(images/flag.png);-fx-background-size: cover;");
+            }
+        }
+    }
+
+    public void uncoverBomb(){
+        if(isBomb()&&!isFlagged()){
+            clicked = true;
+            setDefaultStyle();
+            this.setStyle(this.getStyle()+";-fx-background-image: url(images/bomb.png);-fx-background-size: cover;");
+        }if(isFlagged()&&!isBomb()){
+            if ((this.x + this.y) % 2 == 0) {
+                this.setStyle("-fx-background-color: " + Settings.getTileColor1());
+            } else {
+                this.setStyle("-fx-background-color: " + Settings.getTileColor2());
             }
         }
     }
