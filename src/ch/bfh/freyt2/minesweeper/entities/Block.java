@@ -87,7 +87,6 @@ public class Block extends Pane {
         //if this is the first click
         if (MinesweeperApplication.firstClick) {
             if (isBomb() || calculateAdjacentBombs() != 0) {
-                System.out.println("reset");
                 MinesweeperApplication.resetBombs();
                 this.clickSquare();
                 return;

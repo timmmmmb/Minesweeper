@@ -101,12 +101,12 @@ public class Settings {
 
     public static void setBoardheight(int boardheight) {
         Settings.boardheight = boardheight;
-        Settings.height = boardheight*32+180;
+        Settings.height = boardheight*32+80;
     }
 
     public static void setBoardwidth(int boardwidth) {
         Settings.boardwidth = boardwidth;
-        Settings.width = boardwidth*32+20;
+        Settings.width = boardwidth*32+14;
     }
 
     public static void setBombs(int bombs) {
