@@ -99,17 +99,17 @@ public class Settings {
         return adjacentBombsColor8;
     }
 
-    public static void setBoardheight(int boardheight) {
+    static void setBoardheight(int boardheight) {
         Settings.boardheight = boardheight;
         Settings.height = boardheight*32+80;
     }
 
-    public static void setBoardwidth(int boardwidth) {
+    static void setBoardwidth(int boardwidth) {
         Settings.boardwidth = boardwidth;
         Settings.width = boardwidth*32+14;
     }
 
-    public static void setBombs(int bombs) {
+    static void setBombs(int bombs) {
         Settings.bombs = bombs;
     }
 }
