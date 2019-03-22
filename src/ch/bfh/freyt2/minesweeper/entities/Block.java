@@ -82,7 +82,7 @@ public class Block extends Pane {
     /**
      * used to click a square
      */
-    private void clickSquare() {
+    public void clickSquare() {
         if (isFlagged() || isClicked() || MinesweeperApplication.gamestate != GameState.RUNNING) return;
         //if this is the first click
         if (MinesweeperApplication.firstClick) {

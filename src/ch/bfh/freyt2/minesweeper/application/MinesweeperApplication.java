@@ -37,7 +37,7 @@ public class MinesweeperApplication extends Application {
             "    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );";
     public static Timeline timeline;
     public static boolean firstClick = true;
-    private static GridPane gamePane = new GridPane();
+    protected static GridPane gamePane = new GridPane();
     private static int minesleft = Settings.getBombs();
     private static int time = 0;
     private static Label minesleftlabel = new Label(String.valueOf(minesleft));
@@ -148,7 +148,7 @@ public class MinesweeperApplication extends Application {
     /**
      * resets all the variables used for running the game
      */
-    private void restart() {
+    protected static void restart() {
         timeline.stop();
         gameStateLabel.setTextFill(Color.WHITE);
         gameStage.setWidth(Settings.getWidth());
@@ -252,4 +252,5 @@ public class MinesweeperApplication extends Application {
         time++;
         timerLabel.setText(String.valueOf(time));
     }
+
 }
